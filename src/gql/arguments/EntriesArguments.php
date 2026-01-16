@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace studioespresso\daterange\gql\arguments;
 
 use craft\gql\arguments\elements\Entry;
@@ -21,28 +23,46 @@ class EntriesArguments extends Entry
      */
     public static function getArguments(): array
     {
-        return array_merge(parent::getArguments(), self::getContentArguments(), [
-            'isFuture' => [
-                'name' => 'isFuture',
-                'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Query entries in the future',
+        return array_merge(
+            parent::getArguments(),
+            self::getContentArguments(),
+            [
+                'isFuture' => [
+                    'name' => 'isFuture',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries in the future',
+                ],
+                'isOngoing' => [
+                    'name' => 'isOngoing',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query ongoing entries',
+                ],
+                'isPast' => [
+                    'name' => 'isPast',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries in the past',
+                ],
+                'isNotPast' => [
+                    'name' => 'isNotPast',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries where the end date is in the future',
+                ],
+                'isBefore' => [
+                    'name' => 'isBefore',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries before the provided date',
+                ],
+                'isAfter' => [
+                    'name' => 'isAfter',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries as after the provided date',
+                ],
+                'isBetween' => [
+                    'name' => 'isBetween',
+                    'type' => Type::listOf(QueryArgument::getType()),
+                    'description' => 'Query entries between the provided date and the provided date',
+                ],
             ],
-            'isOngoing' => [
-                'name' => 'isOngoing',
-                'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Query ongoing entries',
-            ],
-            'isPast' => [
-                'name' => 'isPast',
-                'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Query entries in the past',
-            ],
-            'isNotPast' => [
-                'name' => 'isNotPast',
-                'type' => Type::listOf(QueryArgument::getType()),
-                'description' => 'Query entries where the end date is in the future',
-            ],
-
-        ]);
+        );
     }
 }

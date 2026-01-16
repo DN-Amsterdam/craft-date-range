@@ -1,30 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace studioespresso\daterange\fields\data;
 
 use Craft;
-use craft\base\FieldInterface;
 use craft\base\Serializable;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\i18n\Locale;
+use DateTime;
+use DateTimeInterface;
 use yii\base\BaseObject;
+
+use function is_array;
 
 class DateRangeData extends BaseObject implements Serializable
 {
-    public $start;
+    public DateTimeInterface $start;
 
-    public $end;
+    public DateTimeInterface $end;
 
-    public $isFuture;
+    public bool $isFuture;
 
-    public $isOngoing;
+    public bool $isOngoing;
 
-    public $isPast;
+    public bool $isPast;
 
-    public $isNotPast;
+    public bool $isNotPast;
 
-
+    /**
+     * @throws \Exception
+     */
     public function __construct($value = null, $config = [])
     {
         $this->start = $value['start'];
@@ -33,10 +40,11 @@ class DateRangeData extends BaseObject implements Serializable
         $this->isOngoing = $this->getIsOngoing();
         $this->isPast = $this->getIsPast();
         $this->isNotPast = $this->getIsNotPast();
+
         parent::__construct($config);
     }
 
-    public function serialize(): mixed
+    public function serialize(): array
     {
         return [$this->start, $this->end];
     }
@@ -50,13 +58,15 @@ class DateRangeData extends BaseObject implements Serializable
             if (isset($format['date'])) {
                 $dateFormat = $format['date'];
             }
+
             if (isset($format['time'])) {
                 $timeFormat = $format['time'];
             }
+
             $format = (
-                    $dateFormat
+                $dateFormat
                 ) . ' ' . (
-                    $timeFormat
+                $timeFormat
                 );
         } else {
             $format = $format;
@@ -82,88 +92,88 @@ class DateRangeData extends BaseObject implements Serializable
 
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
      * @return bool
      * @throws \Exception
      */
-    public function getIsFuture()
+    public function getIsFuture(): bool
     {
-        $now = new \DateTime();
+        $now = new DateTime();
+
         if ($this->start->format('U') > $now->format('U')) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
      * @return bool
      * @throws \Exception
      */
-    public function getIsOngoing()
+    public function getIsOngoing(): bool
     {
-        $now = new \DateTime();
+        $now = new DateTime();
+
         if (
             $this->start->format('U') < $now->format('U')
             && $this->end->format('U') > $now->format('U')
         ) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
      * @return bool
      * @throws \Exception
      */
-    public function getIsPast()
+    public function getIsPast(): bool
     {
-        $now = new \DateTime();
+        $now = new DateTime();
+
         if ($this->end->format('U') < $now->format('U')) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * @param \DateTime $start
-     * @param \DateTime $end
      * @return bool
      * @throws \Exception
      */
-    public function getIsNotPast()
+    public function getIsNotPast(): bool
     {
-        $now = new \DateTime();
+        $now = new DateTime();
+
         if ($this->end->format('U') > $now->format('U')) {
             return true;
         }
+
         return false;
     }
 
-    public static function normalize($value, FieldInterface $config)
+    /**
+     * @throws \Exception
+     */
+    public static function normalize($value): false|array
     {
         if (!is_array($value)) {
             $value = Json::decode($value);
         }
 
-        if ((isset($value['start']['date']) && !$value['start']['date'])
-        ) {
+        if (isset($value['start']['date']) && !$value['start']['date']) {
             return false;
-        } else {
-            if (isset($value['end']['date']) && !$value['end']['date']) {
-                $value['end']['date'] = $value['start']['date'];
-            }
         }
 
-        $start = $value['start'];
-        $start = DateTimeHelper::toDateTime($start);
+        if (isset($value['end']['date']) && !$value['end']['date']) {
+            $value['end']['date'] = $value['start']['date'];
+            $value['end']['time'] = '23:59';
+        }
 
-        $end = $value['end'];
-        $end = DateTimeHelper::toDateTime($end);
+        $start = DateTimeHelper::toDateTime($value['start']);
+        $end = DateTimeHelper::toDateTime($value['end']);
 
         return [
             'start' => $start,

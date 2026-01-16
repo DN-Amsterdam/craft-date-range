@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace studioespresso\daterange\gql\types;
 
@@ -22,37 +23,14 @@ class DateRangeType extends ObjectType
         /** @var DateRangeData $source */
         $fieldName = $resolveInfo->fieldName;
 
-        switch ($fieldName) {
-            case 'start':
-                return $source->start;
-                break;
-
-            case 'end':
-                return $source->end;
-                break;
-
-            case 'isPast':
-                return $source->isPast;
-                break;
-
-            case 'isNotPast':
-                return $source->isNotPast;
-                break;
-
-            case 'isFuture':
-                return $source->isFuture;
-                break;
-
-            case 'isOnGoing':
-            case 'isOngoing':
-                return $source->isOngoing;
-                break;
-
-            default:
-                return $source->$fieldName;
-                break;
-
-
-        }
+        return match ($fieldName) {
+            'start' => $source->start,
+            'end' => $source->end,
+            'isPast' => $source->isPast,
+            'isNotPast' => $source->isNotPast,
+            'isFuture' => $source->isFuture,
+            'isOnGoing' => $source->isOngoing,
+            default => $source->{$fieldName},
+        };
     }
 }

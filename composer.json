@@ -11,19 +11,24 @@
         "date range"
     ],
     "support": {
-        "docs": "https://github.com/studioespresso/craft-date-range/blob/master/README.md",
-        "issues": "https://github.com/studioespresso/craft-date-range/issues"
+        "docs": "https://github.com/DN-Amsterdam/craft-date-range/blob/main/README.md",
+        "issues": "https://github.com/DN-Amsterdam/craft-date-range/issues"
     },
     "license": "MIT",
     "authors": [
         {
             "name": "Studio Espresso",
             "homepage": "https://www.studioespresso.co"
+        },
+        {
+            "name": "Digital Natives",
+            "homepage": "https://www.digitalnatives.nl"
         }
     ],
     "require": {
         "php": "^8.2",
-        "craftcms/cms": "^5.0.0"
+        "craftcms/cms": "^5.0.0",
+        "nesbot/carbon": "^2.0.0 | ^3.0.0"
     },
     "require-dev": {
         "craftcms/ecs": "dev-main",
@@ -44,7 +49,7 @@
         "handle": "date-range",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/studioespresso/craft-date-range/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/DN-Amsterdam/craft-date-range/main/CHANGELOG.md",
         "class": "studioespresso\\daterange\\DateRange"
     },
     "funding": [

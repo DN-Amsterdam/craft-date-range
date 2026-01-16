@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## DN Forked Changes
+- Added support for the following queries:
+  - isBefore, isAfter, isBetween
+- Generic code cleanup
+
 ## Forked Changes
 - Added support for Craft Commerce product types alongside standard entry types
 - Improved type handling to work with multiple entry/product types simultaneously
