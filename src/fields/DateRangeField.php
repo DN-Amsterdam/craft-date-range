@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Date Range plugin for Craft CMS 3.x
  *
@@ -8,6 +9,8 @@
  * @copyright Copyright (c) 2019 Studio Espresso
  */
 
+declare(strict_types=1);
+
 namespace studioespresso\daterange\fields;
 
 use Craft;
@@ -16,11 +19,13 @@ use craft\base\Field;
 use craft\base\PreviewableFieldInterface;
 use craft\base\SortableFieldInterface;
 use craft\helpers\Db;
+use craft\helpers\Html;
 use craft\i18n\Locale;
 use GraphQL\Type\Definition\Type;
 use studioespresso\daterange\fields\data\DateRangeData;
 use studioespresso\daterange\gql\types\generators\DateRangeGenerator;
 use studioespresso\daterange\validators\EndDateValidator;
+use yii\base\InvalidConfigException;
 use yii\db\Schema;
 
 /**
@@ -33,16 +38,11 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
     // Public Properties
     // =========================================================================
 
-    /**
-     * @var string
-     */
     public $someAttribute = 'Some Default';
 
-    public $showStartTime = false;
-
-    public $showEndTime = false;
-
-    public $endAfterStart = true;
+    public bool $showStartTime = false;
+    public bool $showEndTime = false;
+    public bool $endAfterStart = true;
 
     // Static Methods
     // =========================================================================
@@ -62,17 +62,9 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
     {
         return 'calendar';
     }
+
     // Public Methods
     // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        $rules = parent::rules();
-        return $rules;
-    }
 
     /**
      * @inheritdoc
@@ -90,35 +82,44 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
         return true;
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function getPreviewHtml(mixed $value, ElementInterface $element): string
     {
         $formatter = Craft::$app->getFormatter();
+
         if (!$value) {
-            return false;
+            return '';
         }
+
         if ($value->start->format('dmyhis') === $value->end->format('dmyhis')) {
             if ($this->getSettings()['showStartTime']) {
                 return $formatter->asDatetime($value->start, Locale::LENGTH_SHORT);
-            } else {
-                return $formatter->asDate($value->start, Locale::LENGTH_SHORT);
             }
-        } else {
-            if ($this->getSettings()['showStartTime'] && $this->getSettings()['showEndTime']) {
-                return $formatter->asDatetime($value->start, Locale::LENGTH_SHORT) . ' - ' .
-                    $formatter->asDatetime($value->end, Locale::LENGTH_SHORT);
-            } elseif ($this->getSettings()['showStartTime'] && !$this->getSettings()['showEndTime']) {
-                return $formatter->asDatetime($value->start, Locale::LENGTH_SHORT) . ' - ' .
-                    $formatter->asDate($value->end, Locale::LENGTH_SHORT);
-            } elseif (!$this->getSettings()['showStartTime'] && $this->getSettings()['showEndTime']) {
-                return $formatter->asDate($value->start, Locale::LENGTH_SHORT) . ' - ' .
-                    $formatter->asDatetime($value->end, Locale::LENGTH_SHORT);
-            } else {
-                return $formatter->asDate($value->start, Locale::LENGTH_SHORT) . ' - ' .
-                    $formatter->asDate($value->end, Locale::LENGTH_SHORT);
-            }
+
+            return $formatter->asDate($value->start, Locale::LENGTH_SHORT);
         }
+
+        if ($this->getSettings()['showStartTime'] && $this->getSettings()['showEndTime']) {
+            return $formatter->asDatetime($value->start, Locale::LENGTH_SHORT) . ' - ' .
+                $formatter->asDatetime($value->end, Locale::LENGTH_SHORT);
+        }
+
+        if ($this->getSettings()['showStartTime'] && !$this->getSettings()['showEndTime']) {
+            return $formatter->asDatetime($value->start, Locale::LENGTH_SHORT) . ' - ' .
+                $formatter->asDate($value->end, Locale::LENGTH_SHORT);
+        }
+
+        if (!$this->getSettings()['showStartTime'] && $this->getSettings()['showEndTime']) {
+            return $formatter->asDate($value->start, Locale::LENGTH_SHORT) . ' - ' .
+                $formatter->asDatetime($value->end, Locale::LENGTH_SHORT);
+        }
+
+        return $formatter->asDate($value->start, Locale::LENGTH_SHORT) . ' - ' .
+            $formatter->asDate($value->end, Locale::LENGTH_SHORT);
     }
-    
+
     public function getContentGqlType(): Type|array
     {
         $typeArray = DateRangeGenerator::generateTypes($this);
@@ -135,6 +136,7 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
         if ($this->endAfterStart) {
             return [EndDateValidator::class];
         }
+
         return [];
     }
 
@@ -142,7 +144,7 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
     /**
      * @inheritdoc
      */
-    public function normalizeValue($value, ElementInterface $element = null): mixed
+    public function normalizeValue($value, ?ElementInterface $element = null): null|false|DateRangeData
     {
         if (!$value) {
             return null;
@@ -152,19 +154,19 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
             return $value;
         }
 
-        $value = DateRangeData::normalize($value, $this);
+        $value = DateRangeData::normalize($value);
         if ($value) {
             return new DateRangeData($value);
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
-     * @param $value DateRangeData
+     * @param DateRangeData $value
      * @inheritdoc
      */
-    public function serializeValue($value, ElementInterface $element = null): mixed
+    public function serializeValue($value, ?ElementInterface $element = null): ?array
     {
         if (!$value) {
             return null;
@@ -174,9 +176,11 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
         if (isset($value->start)) {
             $data['start'] = Db::prepareDateForDb($value->start);
         }
+
         if (isset($value->end)) {
             $data['end'] = Db::prepareDateForDb($value->end);
         }
+
         return $data;
     }
 
@@ -196,17 +200,17 @@ class DateRangeField extends Field implements PreviewableFieldInterface, Sortabl
 
     public function isValueEmpty($value, ElementInterface $element): bool
     {
-        return !$value ? true : false;
+        return empty($value);
     }
 
     /**
      * @inheritdoc
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml($value, ?ElementInterface $element = null): string
     {
 
         // Get our id and namespace
-        $id = Craft::$app->getView()->formatInputId($this->handle);
+        $id = Html::id($this->handle);
         $namespacedId = Craft::$app->getView()->namespaceInputId($id);
 
         // Render the input template
