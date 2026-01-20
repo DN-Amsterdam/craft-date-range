@@ -17,6 +17,7 @@ use yii\base\InvalidConfigException;
 
 use function count;
 use function is_array;
+use function is_null;
 use function is_object;
 use function is_string;
 
@@ -61,6 +62,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|bool|null $entryTypeHandle = null,
         bool $includeToday = false,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue($value, $entryTypeHandle, $includeToday);
 
         $this->handle = $value['handle'];
@@ -76,6 +81,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|bool|null $entryTypeHandle = null,
         bool $includeToday = false,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue($value, $entryTypeHandle, $includeToday);
 
         $this->handle = $value['handle'];
@@ -91,6 +100,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|bool|null $entryTypeHandle = null,
         bool $includeToday = false,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue($value, $entryTypeHandle, $includeToday);
 
         $this->handle = $value['handle'];
@@ -106,6 +119,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|bool|null $entryTypeHandle = null,
         bool $includeToday = false,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue($value, $entryTypeHandle, $includeToday);
 
         $this->handle = $value['handle'];
@@ -121,6 +138,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|null $entryTypeHandle = null,
         DateTimeInterface|string|null $date = null,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue2($value, $entryTypeHandle, $date);
 
         $this->handle = $value['handle'];
@@ -136,6 +157,10 @@ class EntryQueryBehavior extends Behavior
         string|array|object|null $entryTypeHandle = null,
         DateTimeInterface|string|null $date = null,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue2($value, $entryTypeHandle, $date);
 
         $this->handle = $value['handle'];
@@ -152,6 +177,10 @@ class EntryQueryBehavior extends Behavior
         DateTimeInterface|string|null $date = null,
         DateTimeInterface|string|null $date2 = null,
     ): EntryQuery {
+        if (is_null($value)) {
+            return $this->owner;
+        }
+
         $value = $this->parseArgumentValue3($value, $entryTypeHandle, $date, $date2);
 
         $this->handle = $value['handle'];
