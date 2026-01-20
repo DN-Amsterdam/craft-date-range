@@ -12,6 +12,7 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\EntryQuery;
 use craft\helpers\Db;
 use DateTimeInterface;
+use GraphQL\Exception\InvalidArgument;
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
 
@@ -144,6 +145,10 @@ class EntryQueryBehavior extends Behavior
 
         $value = $this->parseArgumentValue2($value, $entryTypeHandle, $date);
 
+        if (empty($value['date'])) {
+            throw new InvalidArgumentException('Date argument is required for isAfter()');
+        }
+
         $this->handle = $value['handle'];
         $this->entryTypeHandle = $value['entryTypeHandle'];
         $this->isAfter = true;
@@ -162,6 +167,10 @@ class EntryQueryBehavior extends Behavior
         }
 
         $value = $this->parseArgumentValue2($value, $entryTypeHandle, $date);
+
+        if (empty($value['date'])) {
+            throw new InvalidArgument('Date argument is required for isBefore()');
+        }
 
         $this->handle = $value['handle'];
         $this->entryTypeHandle = $value['entryTypeHandle'];
@@ -182,6 +191,10 @@ class EntryQueryBehavior extends Behavior
         }
 
         $value = $this->parseArgumentValue3($value, $entryTypeHandle, $date, $date2);
+
+        if (empty($value['date']) || empty($value['date2'])) {
+            throw new InvalidArgument('Two date arguments are required for isBetween()');
+        }
 
         $this->handle = $value['handle'];
         $this->entryTypeHandle = $value['entryTypeHandle'];
